@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>DVERSO Club — Tessera Fedeltà</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #0a0a0a;
+      --off-black: #111111;
+      --fucsia: #E91E8C;
+      --fucsia-light: #FF4DAD;
+      --fucsia-faint: rgba(233,30,140,0.12);
+      --white: #FAFAF8;
+      --muted: #888;
+      --border: rgba(233,30,140,0.28);
+      --serif: 'Playfair Display', Georgia, serif;
+      --sans: 'DM Sans', system-ui, sans-serif;
+    }
+    html, body {
+      background: var(--black);
+      min-height: 100vh;
+      font-family: var(--sans);
+      color: var(--white);
+    }
+    .app {
+      max-width: 420px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: var(--black);
+      position: relative;
+    }
+    .screen { display: none; animation: fadeIn 0.35s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 20px 14px;
+      border-bottom: 0.5px solid var(--border);
+      position: sticky; top: 0; background: var(--black); z-index: 10;
+    }
+    .logo-txt { font-family: var(--serif); font-size: 20px; letter-spacing: 2px; color: var(--white); }
+    .logo-txt span { color: var(--fucsia); }
+
+    .hero-section { padding: 36px 24px 0; text-align: center; }
+    .hero-tag {
+      display: inline-block; border: 0.5px solid var(--fucsia); color: var(--fucsia);
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      padding: 5px 14px; border-radius: 20px; margin-bottom: 20px;
+    }
+    .hero-title { font-family: var(--serif); font-size: 34px; line-height: 1.2; margin-bottom: 14px; }
+    .hero-title em { color: var(--fucsia); font-style: italic; }
+    .hero-sub { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 36px; }
+
+    .loyalty-card {
+      margin: 0 24px 28px;
+      background: linear-gradient(135deg, #1a0a12 0%, #260d1a 50%, #1a0a12 100%);
+      border: 0.5px solid var(--fucsia);
+      border-radius: 16px; padding: 22px 20px 18px;
+      position: relative; overflow: hidden;
+    }
+    .loyalty-card::before {
+      content: ''; position: absolute; top: -30px; right: -30px;
+      width: 120px; height: 120px; border-radius: 50%;
+      border: 0.5px solid rgba(233,30,140,0.2);
+    }
+    .loyalty-card::after {
+      content: ''; position: absolute; bottom: -20px; left: -20px;
+      width: 80px; height: 80px; border-radius: 50%;
+      border: 0.5px solid rgba(233,30,140,0.15);
+    }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    .card-brand { font-family: var(--serif); font-size: 15px; letter-spacing: 2px; color: var(--fucsia); }
+    .card-tier { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(233,30,140,0.6); }
+    .card-name { font-size: 14px; font-weight: 300; margin-bottom: 4px; }
+    .card-id { font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 1px; }
+    .card-footer { display: flex; justify-content: space-between; align-items: flex-end; }
+    .card-pts-num { font-family: var(--serif); font-size: 28px; color: var(--fucsia); line-height: 1; }
+    .card-pts-label { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1px; text-transform: uppercase; }
+    .card-next { text-align: right; }
+    .card-next-num { font-size: 13px; font-weight: 500; }
+    .card-next-label { font-size: 10px; color: rgba(255,255,255,0.4); }
+
+    .stamps-section { padding: 0 24px; margin-bottom: 28px; }
+    .stamps-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+    .stamps-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .stamp {
+      aspect-ratio: 1; border-radius: 50%;
+      border: 0.5px solid rgba(233,30,140,0.25);
+      display: flex; align-items: center; justify-content: center;
+      background: var(--off-black);
+    }
+    .stamp.filled { background: var(--fucsia-faint); border-color: var(--fucsia); }
+    .stamp.filled::after { content: ''; display: block; width: 10px; height: 10px; border-radius: 50%; background: var(--fucsia); }
+    .stamp.empty::after { content: ''; display: block; width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); }
+
+    .progress-wrap { margin: 0 24px 28px; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+    .progress-bar { height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--fucsia); border-radius: 2px; }
+
+    .how-section { padding: 0 24px 28px; }
+    .section-title { font-family: var(--serif); font-size: 20px; margin-bottom: 20px; }
+    .how-item { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+    .how-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 0.5px solid var(--fucsia); color: var(--fucsia);
+      font-size: 12px; font-weight: 500;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .how-text-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+    .how-text-sub { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    .benefit-card {
+      margin: 0 24px 28px; padding: 18px 20px;
+      background: var(--fucsia-faint); border: 0.5px solid var(--fucsia);
+      border-radius: 12px; display: flex; align-items: center; gap: 16px;
+    }
+    .benefit-icon { font-size: 28px; }
+    .benefit-txt-big { font-family: var(--serif); font-size: 22px; color: var(--fucsia); line-height: 1; }
+    .benefit-txt-sub { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+
+    .cta-section { padding: 0 24px 32px; }
+    .btn-primary {
+      width: 100%; padding: 16px; background: var(--fucsia); color: #fff;
+      border: none; border-radius: 8px; font-family: var(--sans);
+      font-size: 14px; font-weight: 500; letter-spacing: 0.5px;
+      cursor: pointer; transition: background 0.2s, transform 0.1s;
+    }
+    .btn-primary:hover { background: var(--fucsia-light); }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-secondary {
+      width: 100%; padding: 14px; background: transparent; color: var(--fucsia);
+      border: 0.5px solid var(--fucsia); border-radius: 8px;
+      font-family: var(--sans); font-size: 14px; cursor: pointer;
+      margin-top: 10px; transition: background 0.2s;
+    }
+    .btn-secondary:hover { background: var(--fucsia-faint); }
+
+    .form-section { padding: 28px 24px; }
+    .form-title { font-family: var(--serif); font-size: 26px; margin-bottom: 8px; }
+    .form-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .field input {
+      width: 100%; padding: 13px 14px; background: var(--off-black);
+      border: 0.5px solid rgba(255,255,255,0.15); border-radius: 8px;
+      color: var(--white); font-family: var(--sans); font-size: 14px;
+      outline: none; transition: border-color 0.2s;
+    }
+    .field input:focus { border-color: var(--fucsia); }
+    .privacy-note { font-size: 11px; color: rgba(255,255,255,0.3); text-align: center; margin-top: 16px; line-height: 1.6; }
+
+    .success-section { padding: 48px 24px; text-align: center; }
+    .success-icon {
+      width: 72px; height: 72px; margin: 0 auto 24px; border-radius: 50%;
+      border: 1px solid var(--fucsia); background: var(--fucsia-faint);
+      display: flex; align-items: center; justify-content: center; font-size: 30px;
+    }
+    .success-title { font-family: var(--serif); font-size: 28px; margin-bottom: 10px; }
+    .success-sub { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 32px; }
+
+    .rewards-header { padding: 28px 24px 16px; }
+    .rewards-title { font-family: var(--serif); font-size: 26px; margin-bottom: 6px; }
+    .rewards-sub { font-size: 13px; color: var(--muted); }
+    .reward-item {
+      margin: 0 24px 12px; padding: 16px 18px;
+      background: var(--off-black); border: 0.5px solid rgba(255,255,255,0.08);
+      border-radius: 10px; display: flex; align-items: center; gap: 14px;
+    }
+    .reward-item.unlocked { border-color: var(--fucsia); background: var(--fucsia-faint); }
+    .reward-disc { font-family: var(--serif); font-size: 20px; color: var(--fucsia); min-width: 48px; text-align: center; }
+    .reward-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+    .reward-req { font-size: 11px; color: var(--muted); }
+    .reward-badge { margin-left: auto; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+    .reward-badge.locked { background: rgba(255,255,255,0.06); color: var(--muted); }
+    .reward-badge.ok { background: var(--fucsia-faint); color: var(--fucsia); }
+
+    .bottom-nav {
+      display: flex; border-top: 0.5px solid var(--border);
+      background: var(--off-black);
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 420px;
+    }
+    .nav-item {
+      flex: 1; padding: 14px 8px 12px;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      cursor: pointer; font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase;
+      color: var(--muted); background: none; border: none; font-family: var(--sans);
+      transition: color 0.2s;
+    }
+    .nav-item.active { color: var(--fucsia); }
+    .nav-icon { font-size: 18px; }
+    .pb { padding-bottom: 80px; }
+    .spacer { height: 16px; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HOME -->
+  <div class="screen active" id="screen-home">
+    <div class="top-bar">
+      <div class="logo-txt">DVERSO <span>Club</span></div>
+      <button class="btn-primary" onclick="goTo('screen-register')" style="width:auto;padding:7px 18px;font-size:12px;border-radius:20px;">Registrati</button>
+    </div>
+    <div class="pb">
+      <div class="hero-section">
+        <div class="hero-tag">Tessera Fedeltà</div>
+        <h1 class="hero-title">Ogni acquisto<br><em>ti premia.</em></h1>
+        <p class="hero-sub">Accumula bollini ad ogni acquisto e sblocca sconti esclusivi nei nostri negozi.</p>
+      </div>
+      <div class="loyalty-card">
+        <div class="card-top">
+          <div><div class="card-brand">DVERSO</div><div class="card-tier">Club Member</div></div>
+          <div style="text-align:right"><div class="card-name">Giulia Rossi</div><div class="card-id">#DV-20480312</div></div>
+        </div>
+        <div class="card-footer">
+          <div><div class="card-pts-num">7</div><div class="card-pts-label">bollini</div></div>
+          <div class="card-next"><div class="card-next-num">3 mancano</div><div class="card-next-label">al prossimo sconto</div></div>
+        </div>
+      </div>
+      <div class="stamps-section">
+        <div class="stamps-label">Bollini raccolti</div>
+        <div class="stamps-grid" id="stamps-home"></div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>0 bollini</span><span>10 per lo sconto</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
+      </div>
+      <div class="how-section">
+        <div class="section-title">Come funziona</div>
+        <div class="how-item"><div class="how-num">1</div><div><div class="how-text-title">Scansiona il QR in negozio</div><div class="how-text-sub">Trovalo all'ingresso o in cassa in tutti i nostri 7 punti vendita.</div></div></div>
+        <div class="how-item"><div class="how-num">2</div><div><div class="how-text-title">Guadagna bollini</div><div class="how-text-sub">1 bollino ogni €10 spesi. Si accumulano automaticamente.</div></div></div>
+        <div class="how-item"><div class="how-num">3</div><div><div class="how-text-title">Riscatta lo sconto</div><div class="how-text-sub">Con 10 bollini ottieni €10 di sconto sul prossimo acquisto.</div></div></div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">🏷</div>
+        <div><div class="benefit-txt-big">€10 sconto</div><div class="benefit-txt-sub">ogni 10 bollini raccolti</div></div>
+      </div>
+      <div class="cta-section">
+        <button class="btn-primary" onclick="goTo('screen-register')">Crea la tua tessera gratuita</button>
+        <button class="btn-secondary" onclick="goTo('screen-rewards')">Scopri i premi disponibili</button>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item active" onclick="navTo('screen-home',this)"><span class="nav-icon">◈</span><span>Home</span></button>
+      <button class="nav-item" onclick="navTo('screen-rewards',this)"><span class="nav-icon">◇</span><span>Premi</span></button>
+      <button class="nav-item" onclick="navTo('screen-register',this)"><span class="nav-icon">○</span><span>Registrati</span></button>
+    </div>
+  </div>
+
+  <!-- REWARDS -->
+  <div class="screen" id="screen-rewards">
+    <div class="top-bar"><div class="logo-txt">DVERSO <span>Club</span></div></div>
+    <div class="pb">
+      <div class="rewards-header"><div class="rewards-title">I tuoi premi</div><div class="rewards-sub">Hai 7 bollini — ancora 3 al prossimo sconto.</div></div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>7 / 10 bollini</span><span>70%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:70%"></div></div>
+      </div>
+      <div class="reward-item unlocked">
+        <div class="reward-disc">€10</div>
+        <div><div class="reward-name">Sconto benvenuto</div><div class="reward-req">Già sbloccato con la registrazione</div></div>
+        <div class="reward-badge ok">Attivo</div>
+      </div>
+      <div class="reward-item">
+        <div class="reward-disc">€10</div>
+        <div><div class="reward-name">Sconto fedeltà</div><div class="reward-req">Accumula 10 bollini</div></div>
+        <div class="reward-badge locked">3 mancano</div>
+      </div>
+      <div class="reward-item">
+        <div class="reward-disc">€10</div>
+        <div><div class="reward-name">Sconto fedeltà</div><div class="reward-req">Accumula altri 10 bollini</div></div>
+        <div class="reward-badge locked">Bloccato</div>
+      </div>
+      <div class="reward-item">
+        <div class="reward-disc" style="font-size:13px">VIP</div>
+        <div><div class="reward-name">Accesso anteprima</div><div class="reward-req">Raggiungi 50 bollini totali</div></div>
+        <div class="reward-badge locked">Bloccato</div>
+      </div>
+      <div class="spacer"></div>
+      <div class="stamps-section">
+        <div class="stamps-label">Bollini attuali</div>
+        <div class="stamps-grid" id="stamps-rewards"></div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="navTo('screen-home',this)"><span class="nav-icon">◈</span><span>Home</span></button>
+      <button class="nav-item active" onclick="navTo('screen-rewards',this)"><span class="nav-icon">◇</span><span>Premi</span></button>
+      <button class="nav-item" onclick="navTo('screen-register',this)"><span class="nav-icon">○</span><span>Registrati</span></button>
+    </div>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="screen" id="screen-register">
+    <div class="top-bar"><div class="logo-txt">DVERSO <span>Club</span></div></div>
+    <div class="pb">
+      <div class="form-section">
+        <div class="form-title">Crea il tuo account</div>
+        <div class="form-sub">Registrati gratis e inizia subito a raccogliere bollini in tutti i nostri negozi di Roma.</div>
+        <div class="field"><label>Nome e Cognome</label><input type="text" placeholder="es. Giulia Rossi" id="inp-name"></div>
+        <div class="field"><label>Numero di telefono</label><input type="tel" placeholder="+39 333 000 0000" id="inp-phone"></div>
+        <div class="field"><label>Email (facoltativa)</label><input type="email" placeholder="email@esempio.it" id="inp-email"></div>
+        <button class="btn-primary" onclick="doRegister()" style="margin-top:8px;">Crea la tessera gratuita</button>
+        <p class="privacy-note">Registrandoti accetti i termini del servizio.<br>I tuoi dati non saranno mai ceduti a terzi.</p>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="navTo('screen-home',this)"><span class="nav-icon">◈</span><span>Home</span></button>
+      <button class="nav-item" onclick="navTo('screen-rewards',this)"><span class="nav-icon">◇</span><span>Premi</span></button>
+      <button class="nav-item active" onclick="navTo('screen-register',this)"><span class="nav-icon">○</span><span>Registrati</span></button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="screen" id="screen-success">
+    <div class="top-bar"><div class="logo-txt">DVERSO <span>Club</span></div></div>
+    <div class="pb">
+      <div class="success-section">
+        <div class="success-icon">✦</div>
+        <div class="success-title">Benvenuta nel Club!</div>
+        <div class="success-sub" id="success-msg">La tua tessera è pronta.</div>
+        <div class="loyalty-card" style="margin:0 0 28px;text-align:left;">
+          <div class="card-top">
+            <div><div class="card-brand">DVERSO</div><div class="card-tier">Nuovo Membro</div></div>
+            <div style="text-align:right"><div class="card-name" id="success-name">—</div><div class="card-id" id="success-id">#DV-—</div></div>
+          </div>
+          <div class="card-footer">
+            <div><div class="card-pts-num">0</div><div class="card-pts-label">bollini</div></div>
+            <div class="card-next"><div class="card-next-num">10 mancano</div><div class="card-next-label">al primo sconto</div></div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="goTo('screen-home')">Vai alla mia tessera</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function buildStamps(id, filled) {
+    var c = document.getElementById(id); if (!c) return; c.innerHTML = '';
+    for (var i = 0; i < 10; i++) { var d = document.createElement('div'); d.className = 'stamp ' + (i < filled ? 'filled' : 'empty'); c.appendChild(d); }
+  }
+  buildStamps('stamps-home', 7);
+  buildStamps('stamps-rewards', 7);
+
+  function goTo(id) {
+    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+  function navTo(id, btn) {
+    goTo(id);
+    btn.closest('.bottom-nav').querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+    btn.classList.add('active');
+  }
+  function doRegister() {
+    var name = document.getElementById('inp-name').value.trim();
+    if (!name) { document.getElementById('inp-name').focus(); return; }
+    var id = 'DV-' + Math.floor(10000000 + Math.random() * 90000000);
+    document.getElementById('success-name').textContent = name;
+    document.getElementById('success-id').textContent = '#' + id;
+    document.getElementById('success-msg').textContent = name.split(' ')[0] + ', la tua tessera è pronta! Mostrala in cassa ad ogni acquisto per iniziare a raccogliere bollini.';
+    goTo('screen-success');
+  }
+</script>
+</body>
+</html>
